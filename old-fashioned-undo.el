@@ -89,6 +89,7 @@
 ;;   is on.
 
 ;;; Change Log:
+;; v6.1 09/14/2024  Use 'cl-lib' to supress compiler warnings.
 ;; v6.0 04/04/2013  Renamed to `old-fashioned-undo.el'.
 ;; v5.2 02/04/2012  Fixed compiler errors.
 ;;                  Fixed errors which occurs to XEmacs.
@@ -130,7 +131,7 @@
 ;;; Code:
 (require 'cl-lib)
 
-(defvar old-fashioned-undo/version "6.0")
+(defvar old-fashioned-undo/version "6.1")
 (defun old-fashioned-undo/version ()
   (interactive)
   (message "old-fashioned-undo version %s" old-fashioned-undo/version))
