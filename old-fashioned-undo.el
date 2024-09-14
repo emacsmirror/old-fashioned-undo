@@ -128,8 +128,7 @@
 
 
 ;;; Code:
-(eval-when-compile
-  (require 'cl))
+(require 'cl-lib)
 
 (defvar old-fashioned-undo/version "6.0")
 (defun old-fashioned-undo/version ()
@@ -273,8 +272,9 @@ after last undo/redo command.")
 ;; ----------------------------------------------------------------------------
 ;;  (old-fashioned-undo/undo-aux &key count by-chunk-p) => VOID
 ;; ----------------------------------------------------------------------------
-(defun* old-fashioned-undo/undo-aux (&key count by-chunk-p)
-  "Auxiliary function for `old-fashioned-undo/undo' and `old-fashioned-undo/undo-1'."
+(cl-defun old-fashioned-undo/undo-aux (&key count by-chunk-p)
+  "Auxiliary function for `old-fashioned-undo/undo' and
+`old-fashioned-undo/undo-1'."
   
   (if (eq buffer-undo-list t)
       (error "No undo information in this buffer"))
@@ -320,8 +320,9 @@ after last undo/redo command.")
 ;; ----------------------------------------------------------------------------
 ;;  (old-fashioned-undo/redo-aux &key count by-chunk-p) => VOID
 ;; ----------------------------------------------------------------------------
-(defun* old-fashioned-undo/redo-aux (&key count by-chunk-p)
-  "Auxiliary function for `old-fashioned-undo/redo' and `old-fashioned-undo/redo-1'."
+(cl-defun old-fashioned-undo/redo-aux (&key count by-chunk-p)
+  "Auxiliary function for `old-fashioned-undo/redo' and
+`old-fashioned-undo/redo-1'."
 
   (if (eq buffer-undo-list t)
       (error "No redo information in this buffer"))
@@ -368,7 +369,7 @@ after last undo/redo command.")
 ;; ----------------------------------------------------------------------------
 ;;  (old-fashioned-undo/display-finish-info COMMAND_NAME REPEAT_COUNT) => VOID
 ;; ----------------------------------------------------------------------------
-(defun* old-fashioned-undo/display-finish-info (&key cmd-name count by-chunk-p)
+(cl-defun old-fashioned-undo/display-finish-info (&key cmd-name count by-chunk-p)
   "Display the number of pending undo/redo."
   (or (eq (selected-window) (minibuffer-window))
       (message "%s%s%s! [Undo: %d%s / Redo: %d%s]"
@@ -408,7 +409,7 @@ after last undo/redo command.")
 ;; ----------------------------------------------------------------------------
 ;;  (old-fashioned-undo/run-primitive-undo COUNT SYM_LIST_1 SYM_LIST_2) => VOID
 ;; ----------------------------------------------------------------------------
-(defun* old-fashioned-undo/run-primitive-undo (&key count undo-lst-name redo-lst-name by-chunk-p)
+(cl-defun old-fashioned-undo/run-primitive-undo (&key count undo-lst-name redo-lst-name by-chunk-p)
   "Execute undo/redo by primitive-undo."
   ;; Prepare for undo/redo BY ONE STEP.
   (when (not by-chunk-p)
@@ -425,10 +426,10 @@ after last undo/redo command.")
     ;; This prevents from unintended movement of point caused by undo operations.
     ;; (This block is added in v2.4)
     (setq chunk-lst-to-redo 
-          (remove-if #'integerp chunk-lst-to-redo))
+          (cl-remove-if #'integerp chunk-lst-to-redo))
     ;; XXX: Experimental 2010/11/5
     (setq chunk-lst-to-redo
-          (remove-if (lambda (elt) (markerp (car elt))) chunk-lst-to-redo))
+          (cl-remove-if (lambda (elt) (markerp (car elt))) chunk-lst-to-redo))
     
     ;; Push `chunk-lst-to-redo' to `redo-lst'.
     (set (symbol-value 'redo-lst-name)
@@ -440,20 +441,20 @@ after last undo/redo command.")
 ;;  (old-fashioned-undo/run-primitive-undo-aux &key count undo-lst-name by-chunk-p)
 ;;                                                         => chunk-lst-to-redo
 ;; ----------------------------------------------------------------------------
-(defun* old-fashioned-undo/run-primitive-undo-aux (&key count undo-lst-name by-chunk-p)
+(cl-defun old-fashioned-undo/run-primitive-undo-aux (&key count undo-lst-name by-chunk-p)
   ""
-  (flet ((1st-is-not-boundary (lst)
-                              (not (null (car lst))))
-         (ldiff! (lst sublst)
-                 ;; Remove SUBLIST from LIST then return LIST.
-                 ;; 
-                 ;; Use this function like nconc:
-                 ;; (setq list (old-fashioned-undo/ldiff! list sublist))
-                 (let ((idx 0))
-                   (while (and (consp (nthcdr idx lst)) (not (eq (nthcdr idx lst) sublst)))
-                     (setq idx (1+ idx)))
-                   (setf (nthcdr idx lst) nil)
-                   lst)))
+  (cl-flet ((1st-is-not-boundary (lst)
+                                 (not (null (car lst))))
+            (ldiff! (lst sublst)
+                    ;; Remove SUBLIST from LIST then return LIST.
+                    ;; 
+                    ;; Use this function like nconc:
+                    ;; (setq list (old-fashioned-undo/ldiff! list sublist))
+                    (let ((idx 0))
+                      (while (and (consp (nthcdr idx lst)) (not (eq (nthcdr idx lst) sublst)))
+                        (setq idx (1+ idx)))
+                      (setf (nthcdr idx lst) nil)
+                      lst)))
     (let ((chunk-lst-to-redo nil)
           (inhibit-quit nil)
           orig-buffer-undo-list
@@ -515,7 +516,7 @@ after last undo/redo command.")
 ;; -----------------------------------------------------------------------------
 ;;  (old-fashioned-undo/lst/split lst &key limit) => num-of-inserted-bounds
 ;; -----------------------------------------------------------------------------
-(defun* old-fashioned-undo/lst/split (lst &key limit)
+(cl-defun old-fashioned-undo/lst/split (lst &key limit)
   "Split LST by inserting boundary between each elements
 from 1st to (1+ LIMIT)th element.
 
@@ -531,7 +532,7 @@ Returns number of boundary inserted to the LST."
             (setcdr next-chunk
                     (cons (car next-chunk) (cdr next-chunk)))
             (setcar next-chunk nil)
-            (incf num-inserted))
+            (cl-incf num-inserted))
           (setq num-inserted (+ num-inserted
                                 (old-fashioned-undo/lst/split next-chunk
                                                        :limit (1- limit))))))
@@ -561,7 +562,7 @@ count chunks in the LST instead of elements."
 ;; -----------------------------------------------------------------------------
 ;;  (old-fashioned-undo/lst/get-next LST &KEY CHUNK-P) => LST
 ;; -----------------------------------------------------------------------------
-(defun* old-fashioned-undo/lst/get-next (lst &key chunk-p)
+(cl-defun old-fashioned-undo/lst/get-next (lst &key chunk-p)
   "Find a sub list which starts with a next undo/redo element from the LST.
 
 When non-nil value is set to the argument CHUNK-P,
