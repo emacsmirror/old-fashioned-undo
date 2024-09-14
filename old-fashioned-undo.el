@@ -31,6 +31,14 @@
 
 ;;; Commentary:
 ;;
+;; A NOTE ON NEWER VERSIONS OF EMACS (>= 28.1)
+;; ===========================================
+;; 
+;; On Emacs versions 28.1 and later, you may no longer
+;; need this library, since the `undo-redo' command provides
+;; similar results to what this library provides.
+;;
+;; 
 ;; Overview
 ;; ========
 ;;

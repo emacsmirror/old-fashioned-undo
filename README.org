@@ -1,0 +1,63 @@
+#+STARTUP: indent
+#+OPTIONS: num:nil toc:nil author:nil timestamp:nil
+
+# Copyright (C) 2001-2003, 2010, 2013, 2024 K-talo Miyazaki, all rights reserved.
+
+* volatile-highlights.el --- Minor mode for visual feedback on some operations.
+
+** A NOTE ON NEWER VERSIONS OF EMACS (>= 28.1)
+
+On Emacs versions 28.1 and later, you may no longer
+need this library, since the `undo-redo' command provides
+similar results to what this library provides.
+
+
+** OVERVIEW
+
+This library provides minor mode `old-fashioned-undo-mode' which
+makes `undo' and `redo' command working in an old fashioned way.
+
+The default `undo/redo' commands provided by emacs records each 
+`undo/redo' operations on `buffer-undo-list'. This behavior may
+make undo/redo operations perfect, but I feel this behavior is
+too much verbose and little bit annoying.
+
+The undo/redo command provided this library never records
+`undo/redo' operation on `buffer-undo-list' so that we can
+`undo/redo' in intuitive way.
+
+Additionally, while `old-fashioned-undo-mode' is on, the number
+of pending `undo/redo' operation will be displayed in the
+minibuffer when each `undo/redo' command is executed.
+
+
+** INSTALLING
+
+To install this library, save this file to a directory in your
+`load-path' (you can view the current `load-path' using "C-h v
+load-path RET" within Emacs), then add the following line to your
+.emacs startup file:
+
+   (require 'old-fashioned-undo)
+   (old-fashioned-undo-mode t)
+
+   
+** USING
+
+To toggle old-fashioned-undo feature, just type:
+
+ `M-x old-fashioned-undo-mode RET'
+
+
+** Key map Examples
+
+(global-set-key [(control z)] 'undo)
+(global-set-key [(control Z)] 'redo)
+
+
+**  KNOWN PROBLEMS
+
+ - Cursor position won't be set properly after undo/redo when cua-mode
+   is on.
+   
+
