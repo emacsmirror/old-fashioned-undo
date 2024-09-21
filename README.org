@@ -3,7 +3,7 @@
 
 # Copyright (C) 2001-2003, 2010, 2013, 2024 K-talo Miyazaki, all rights reserved.
 
-* volatile-highlights.el --- Minor mode for visual feedback on some operations.
+* old-fashioned-undo.el --- Undo/Redo in very simple, and old fashioned way.
 
 ** A NOTE ON NEWER VERSIONS OF EMACS (>= 28.1)
 
